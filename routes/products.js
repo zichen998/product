@@ -70,8 +70,10 @@ router.addProduct = (req, res) => {
 router.incrementUpvotes = (req, res) => {
 
     products.findById(req.params.id, function(err,product) {
-        if (err)
-            res.json({ message: 'product NOT Found!', errmsg : err } );
+        if (err) {
+            res.status(404);
+            res.json({message: 'product NOT Found!', errmsg: err});
+        }
         else {
             product.upvotes += 1;
             product.save(function (err) {

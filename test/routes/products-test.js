@@ -92,18 +92,90 @@ describe('products', function (){
                     done();
                 });
         });
-});
-    describe('PUT /products/name/vote', () => {
-        it('should return a message and the product upvoted by 1', function(done) {
+    });
+    describe('PUT /products/:id/vote', function () {
+        it('should return a 404 and a message for invalid product id', function(done) {
             chai.request(server)
-                .put('/products/5bd2e4597c992c4e74424b0e/vote')
+                .put('/products/5bdxxxxxx7179a176d3b377a/vote')
+                .end(function(err, res) {
+                    expect(res).to.have.status(404);
+                    expect(res.body).to.have.property('message').equal('product NOT Found!' ) ;
+                    done();
+                });
+        });
+        it('should return a message and the product reported by 1', function(done) {
+            chai.request(server)
+                .put('/products/5bd0b9e03aa4ac29084f6fc7/vote')
                 .end(function(err, res) {
                     expect(res).to.have.status(200);
-                    expect(res.body).to.have.property('message',"product Successfully UpVoted!");
-                    expect(res.body.data.upvotes).to.equal(1);
+                    // let imitation = res.body.data ;
+                    // expect(imitation).to.include( { brand:'Coach', type:'bag', price:350, reports: 20  } );
+                    expect(res.body).to.have.property('message').equal('product Successfully UpVoted!' );
+                    done();
+                });
+        });
+        after(function  (done) {
+            chai.request(server)
+                .get('/products')
+                .end(function(err, res) {
+                    let result = _.map(res.body, (product) => {
+                        return { name: product.name,
+                            paymenttype: product.paymenttype,
+                            amount: product.amount,
+                        };
+                    }  );
+                    expect(result).to.include( {name:"Air Jordan 1*Off-White",paymenttype:"Direct",amount: 1600 } );
                     Datastore.collection.remove();
                     done();
                 });
+        });
+    });
+
+    describe('Delete /products/:id', function () {
+        describe('when it is valid id', function () {
+            it('should return a message and the product successfully deleted', function (done) {
+                chai.request(server)
+                    .delete('/products/5bd0b9e03aa4ac29084f6fc7')
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.have.property('message').equal('product Successfully Deleted!');
+                        done();
+                    })
+            });
+            after(function (done) {
+                chai.request(server)
+                    .get('/products')
+                    .end(function (err, res) {
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.a('array');
+                        let result = _.map(res.body, (product) => {
+                            return {
+                                name: product.name,
+                                paymenttype: product.paymenttype,
+                                amount: product.amount,
+                            };
+                        });
+                        expect(result).to.not.include({
+                            name: "Air Jordan 1*Off-White",
+                            amount: 1600,
+                            paymenttype: "Direct"
+                        });
+                        done();
+                    });
+            });
+            describe('when it is invalid', function () {
+                it('should return a message and the product unsuccessfully deleted', function (done) {
+                    chai.request(server)
+                        .delete('/products/5bdxxxxxx7179a176d3b377a')
+                        .end(function (err, res) {
+                            expect(res).to.have.status(200);
+                            expect(res.body).to.have.property('message').equal('product NOT DELETED!');
+                            Datastore.collection.remove();
+                            done();
+                        })
+                });
+
+            });
         });
 
     });
