@@ -1,3 +1,14 @@
+GET http://localhost:3000/products/
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json
+
+{"name" : "yeezy 700 boost","colorl" : "black","amount" : 1600,"upvotes" : 0}
+
+<> 2018-11-05T082943.200.json
+
+###
+
 GET http://localhost:3000/products/5bd2f2383a35a718944ae576
 Accept: */*
 Cache-Control: no-cache
@@ -528,17 +539,6 @@ Content-Type: application/json
 {"name" : "zichen liu","email" : "1242313097@qq.com","upvotes" : 0}
 
 <> 2018-10-25T064748.200.json
-
-###
-
-GET http://localhost:3000/products/5bd1fbdf60b7890604a58c21
-Accept: */*
-Cache-Control: no-cache
-Content-Type: application/json
-
-{"name" : "zichen liu","email" : "1242313097@qq.com","upvotes" : 0}
-
-<> 2018-10-25T064746.200.json
 
 ###
 

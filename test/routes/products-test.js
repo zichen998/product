@@ -3,11 +3,44 @@ let chaiHttp = require('chai-http');
 
 let server = require('../../bin/www');
 let expect = chai.expect;
-
+let Datastore = require('../../models/products');
 chai.use(chaiHttp);
 let _ = require('lodash' );
 chai.use(require('chai-things'));
 describe('products', function (){
+    beforeEach(function(done){
+        let datastore1 = new Datastore({
+            upvotes: 0,
+            _id: "5bd0b9e03aa4ac29084f6fc7",
+            paymenttype: "Direct",
+            amount: 1600,
+            color: "black",
+            name: "Air Jordan 1*Off-White",
+
+        });
+        let datastore2 = new Datastore({
+            upvotes: 0,
+            _id: "5bd0ba6e3aa4ac29084f6fc8",
+            paymenttype: "Pay Pal",
+            amount: 1600,
+            color: "white",
+            name: "Supreme*CDG boxlogo",
+        });
+        let datastore3 = new Datastore({
+
+            upvotes: 0,
+
+
+            _id: "5bd2e4597c992c4e74424b0e",
+            amount: 1600,
+            name: "Fragment design",
+        });
+        datastore1.save();
+        datastore2.save();
+        datastore3.save();
+        done();
+    });
+
     describe('GET /products',  () => {
         it('should return all the products in an array', function(done) {
             chai.request(server)
@@ -23,7 +56,7 @@ describe('products', function (){
                     expect(result).to.include( {  name: "Air Jordan 1*Off-White", amount: 1600  } );
                     expect(result).to.include( { name: "Supreme*CDG boxlogo", amount: 1600  } );
                     expect(result).to.include( { name: "Fragment design", amount: 1600  } );
-
+                    Datastore.collection.remove();
                     done();
                 });
         });
@@ -55,6 +88,7 @@ describe('products', function (){
                         };
                     });
                     expect(result).to.include({paymenttype: 'Direct', amount: 1600});
+                    Datastore.collection.remove();
                     done();
                 });
         });
@@ -66,11 +100,14 @@ describe('products', function (){
                 .end(function(err, res) {
                     expect(res).to.have.status(200);
                     expect(res.body).to.have.property('message',"product Successfully UpVoted!");
-                    expect(res.body.data.upvotes).to.equal(2);
+                    expect(res.body.data.upvotes).to.equal(1);
+                    Datastore.collection.remove();
                     done();
                 });
         });
 
     });
+
+
 });
 module.exports = server;
